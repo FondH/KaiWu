@@ -1,0 +1,47 @@
+/aiarena/code/
+├── actor
+│   ├── __init__.py
+│   ├── actor.py                # actor 流程, 一般不需要改动
+│   ├── agent.py                # base agent, 一般不需要改动
+│   ├── agent_demo.py           # 规则agent的示例
+│   ├── config.json             # reward 配置
+│   ├── custom.py               # 在agent中自定义feature示例
+│   ├── entry.py                # actor 程序入口
+│   ├── model.py                # model 文件, 一般不需要改动
+│   ├── rl_data_info.py         # 一般不需要改动
+│   ├── sample_manager.py       # 发送样本给learner, 修改feature或样本需要修改
+│   └── server.py               # 对战 server 程序入口, 用于平台对战
+├── common
+│   ├── algorithm_torch.py      # pytorch 网络代码
+│   └── config.py               # 部分配置文件
+└── learner
+    ├── __init__.py
+    ├── config
+    │   └── common.conf         # learner的默认配置, 一般不需要改动
+    └── train.py                # learner 程序入口
+
+
+    Actor: 对局逻辑, 不断与gamecore交互获得新的state信息, 返回给gamecore需要执行的动作,
+    保存样本到SampleManager并发送样本给learner.
+
+
+
+state_dict["observation"]:{0-101 我方血量位置 102
+                           102-234 第几次普通攻击 133
+                           235-336 敌方血量位置  102
+                           337-469 敌方第几次攻击 133
+                           470-483 敌方小兵是否在我塔下 14
+                           484-555 小兵血量位置 72
+                           556-627 小兵血量位置 72
+                           628-663 塔血 36
+                           664-699 塔血 36
+                           700-704 游戏阶段 5 one-hot
+                           705-724 自定义 20
+}
+英雄特征经过视野过滤,当敌方英雄不在视野中时, 敌方英雄部分特征会被置为默认值.
+
+
+state_dict["legal_action"] 172
+state_dict["sub_action_mask"] 12*6  12个button对应的{Button(都为1),MoveX,MoveY,SkillX,SkillY,Target}
+episode_infos[i]["win"](loss_camp) == -1 平局 0胜利
+reward :[dead,ep_rate,exp,hp_point,kill,last_hit,money,tower_hp_point,reward_sum]
